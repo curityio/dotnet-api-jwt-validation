@@ -19,7 +19,7 @@ This repository contains example code on how to use JWTs for authorization in .N
     }
 
 
-This repository contains the result of the `Securing .NET Core API with JWT <https://curity.io/resources/tutorials/howtos/writing-apis/dotnet-api/>`_ article. That article contains more in-depth information about the source code.
+This repository contains the result of the `Securing .NET Core API with JWT <https://curity.io/resources/learn/dotnet-api/>`_ article. That article contains more in-depth information about the source code.
 
 Run the example
 ~~~~~~~~~~~~~~~~~~~
