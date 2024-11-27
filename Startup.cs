@@ -31,7 +31,7 @@ namespace weather
                 .AddJwtBearer(options =>
                 {
                     options.Authority = Configuration["Authorization:Issuer"];
-                    options.Audience = Configuration["Authorization:ClientId"];
+                    options.Audience = Configuration["Authorization:Audience"];
                 });
 
             services.AddAuthorization(options =>
