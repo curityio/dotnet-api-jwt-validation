@@ -39,7 +39,7 @@ namespace weather
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
-                        ValidateIssuerSigningKey = false,
+                        ValidateIssuerSigningKey = true,
                         ValidAudiences = validAudiences,
                         ValidIssuer = validIssuer,
                         IssuerSigningKey = await GetIssuerSigningKeyAsync(jwksUri, keyId, alg)
