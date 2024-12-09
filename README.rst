@@ -7,7 +7,7 @@ Validate JWTs in .NET
 .. image:: https://img.shields.io/badge/availability-source-blue
     :target: https://curity.io/resources/code-examples/status/
 
-This repository contains example code on how to use JWTs for authorization in .NET APIs. This will be managed using the `.NET Core Security Framework <https://docs.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-5.0/>`_. This allows for easy annotation of an endpoint to specify authorization policies.
+This repository contains example code on how to use JWTs for authorization in .NET APIs. This will be managed using the `.NET Core Security Framework <https://learn.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-8.0/>`_. This allows for easy annotation of an endpoint to specify authorization policies.
 
 ::
 
