@@ -20,6 +20,13 @@ The API uses an `appSettings.json` file to configure its expected issuer, audien
 }
 ```
 
+## Configure the Curity Identity Server
+
+Before running the app you need to configure an authorization server like a local Docker instance of the Curity Identity Server:
+
+- [Run a local Docker instance](https://curity.io/resources/learn/run-curity-docker/).
+- [Use the token designer to configure scopes and claims](https://curity.io/resources/learn/token-designer/).
+
 ## Run the Example
 
 Ensure that an up to date [.NET SDK](https://dotnet.microsoft.com/en-us/download) is installed, then run the example:
@@ -28,6 +35,21 @@ Ensure that an up to date [.NET SDK](https://dotnet.microsoft.com/en-us/download
 export ASPNETCORE_ENVIRONMENT='Development'
 dotnet build
 dotnet run
+```
+
+The configuration uses a local example domain for the authorization server.\
+To use it, add the following entry to your local computer's hosts file:
+
+```text
+127.0.0.1 login.example.com
+```
+
+## Call the API
+
+You can run a script to call the API with an example client:
+
+```bash
+./callApi.sh
 ```
 
 ## Run a Deployed API
@@ -40,5 +62,5 @@ To run the API in a [Docker](https://docs.docker.com/engine/install/) container,
 
 ## Further Information
 
-- See the [API Tutorial](https://curity.io/resources/learn/dotnet-api) for further details on the example API's security behavior.
+- See the [.NET API Tutorial](https://curity.io/resources/learn/dotnet-api) for further details on the example API's security behavior.
 - See the [JWT Best Practices](https://curity.io/resources/learn/jwt-best-practices/) article for further information on using JWTs correctly.
