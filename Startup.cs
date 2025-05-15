@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 
 namespace Demo
@@ -46,6 +47,9 @@ namespace Demo
 
             services.AddAuthorization(options =>
             {
+                // Ensure that all endpoints require JWT validation
+                options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+
                 // Normal sensitivity endpoints require at least a read scope in the access token
                 options.AddPolicy("has_required_scope", policy =>
                     policy.RequireAssertion(context =>

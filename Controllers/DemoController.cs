@@ -14,7 +14,6 @@ namespace Demo.Controllers
          * A normal security level endpoint that enforces a required scope
          */
         [HttpGet("data")]
-        [Authorize]
         [Authorize(Policy = "has_required_scope")]
         public IActionResult MediumSensitivityData()
         {
@@ -25,7 +24,6 @@ namespace Demo.Controllers
          * A high security endpoint that also requires a custom claim with a low risk score
          */
         [HttpGet("highworthdata")]
-        [Authorize]
         [Authorize(Policy = "has_required_scope")]
         [Authorize(Policy = "has_low_risk")]
         public IActionResult HighSensitivityData()
