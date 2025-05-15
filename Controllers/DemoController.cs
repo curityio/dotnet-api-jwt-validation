@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
@@ -14,29 +11,31 @@ namespace Demo.Controllers
     public class DemoController : ControllerBase
     {
         /*
-         * An endpoint that enforces a required scope
+         * A normal security level endpoint that enforces a required scope
          */
         [HttpGet("data")]
-        [Authorize(Policy = "scope")]
+        [Authorize]
+        [Authorize(Policy = "has_required_scope")]
         public IActionResult MediumSensitivityData()
         {
-            return Ok(new { data = "Some data for developers", user = GetSubject(), title = GetClaim("title") });
+            return Ok(new { data = "Some medium sensitivity data", user = GetSubject() });
         }
 
         /*
-         * A high security endpoint that also requires a low risk score
+         * A high security endpoint that also requires a custom claim with a low risk score
          */
-        [HttpGet("sensitivedata")]
-        [Authorize(Policy = "scope")]
-        [Authorize(Policy = "low_risk")]
+        [HttpGet("highworthdata")]
+        [Authorize]
+        [Authorize(Policy = "has_required_scope")]
+        [Authorize(Policy = "has_low_risk")]
         public IActionResult HighSensitivityData()
         {
-            return Ok(new { data = "Your risk score is low", user = GetSubject(), risk = GetClaim("risk") });
+            return Ok(new { data = "Some high sensitivity data", user = GetSubject(), risk = GetClaim("risk") });
         }
 
         private String GetSubject()
         {
-            return GetClaim(ClaimTypes.NameIdentifier);
+            return GetClaim("sub");
         }
 
         private String GetClaim(String type)

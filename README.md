@@ -13,7 +13,7 @@ The API uses an `appSettings.json` file to configure its expected issuer, audien
 ```json
 {
   "Authorization": {
-    "Issuer": "https://idsvr.example.com/oauth/v2/oauth-anonymous",
+    "Issuer": "https://login.example.com/oauth/v2/oauth-anonymous",
     "Audience": "demo-api",
     "Algorithm": "RS256"
   }
@@ -26,10 +26,12 @@ Before running the app you need to configure an authorization server like a loca
 
 - [Run a local Docker instance](https://curity.io/resources/learn/run-curity-docker/).
 - [Use the token designer to configure scopes and claims](https://curity.io/resources/learn/token-designer/).
+- [Create a client that gets an access token to send to the API](https://curity.io/resources/learn/configure-client/).
 
 ## Run the Example
 
-Ensure that an up to date [.NET SDK](https://dotnet.microsoft.com/en-us/download) is installed, then run the example:
+Ensure that an up to date [.NET SDK](https://dotnet.microsoft.com/en-us/download) is installed, then run the example.\
+Use developer-specific settings if required, such as the use of HTTP OAuth URLs.
 
 ```bash
 export ASPNETCORE_ENVIRONMENT='Development'
@@ -38,7 +40,7 @@ dotnet run
 ```
 
 The configuration uses a local example domain for the authorization server.\
-To use it, add the following entry to your local computer's hosts file:
+To use such a domain, add the following entry to your local computer's hosts file:
 
 ```text
 127.0.0.1 login.example.com
@@ -46,10 +48,18 @@ To use it, add the following entry to your local computer's hosts file:
 
 ## Call the API
 
-You can run a script to call the API with an example client:
+You can then act as an OAuth client to get an access token and call the API.\
+The following endpoint returns normal sensitivity data and requires a `read` scope:
 
 ```bash
-./callApi.sh
+curl -i http://localhost:5000/demo/data -H "Authorization: Bearer $ACCESS_TOKEN"
+```
+
+The following endpoint return higher sensitivity data and also requires a custom `risk` claim with a value below 50.\
+Such a claim might originate from an external system like a risk engine.
+
+```bash
+curl -i http://localhost:5000/demo/highworthdata -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
 ## Run a Deployed API
@@ -63,4 +73,4 @@ To run the API in a [Docker](https://docs.docker.com/engine/install/) container,
 ## Further Information
 
 - See the [.NET API Tutorial](https://curity.io/resources/learn/dotnet-api) for further details on the example API's security behavior.
-- See the [JWT Best Practices](https://curity.io/resources/learn/jwt-best-practices/) article for further information on using JWTs correctly.
+- See the [JWT Best Practices](https://curity.io/resources/learn/jwt-best-practices/) article for further information on using JWTs securely.
