@@ -1,68 +1,87 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
-namespace weather
+namespace Demo
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
+
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            // All API requests require JWT access token validation
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    // Use OAuth claim names to prevent the claims principal recxiving Microsoft-specific claim names
+                    options.MapInboundClaims = false;
+
+                    // Use JWT best practices to check the expected parameters of issuer, audience and algorithm
                     options.Authority = Configuration["Authorization:Issuer"];
                     options.Audience = Configuration["Authorization:Audience"];
+                    options.TokenValidationParameters.ValidAlgorithms = [Configuration["Authorization:Algorithm"]];
+
+                    if (Environment.IsDevelopment())
+                    {
+                        options.RequireHttpsMetadata = false;
+                    }
                 });
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("lowRisk", policy =>
+                // Ensure that all endpoints require JWT validation
+                options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+
+                // Normal sensitivity endpoints require at least a read scope in the access token
+                options.AddPolicy("has_required_scope", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(claim =>
+                            claim.Type == "scope" && claim.Value.Split(' ').Any(c => c == "read")
+                        )
+                    )
+                );
+
+                // Higher sensitivity endpoints also require a qualifying risk score as a custom claim in the access token
+                options.AddPolicy("has_low_risk", policy =>
                     policy.RequireAssertion(context =>
                         context.User.HasClaim(claim =>
                             claim.Type == "risk" && Int32.Parse(claim.Value) < 50
                         )
                     )
                 );
-                options.AddPolicy("developer", policy =>
-                    policy.RequireClaim("title", "junior developer", "senior developer")
-                    .RequireClaim("department", "development")
-                );
             });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "weather", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo", Version = "v1" });
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "weather v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo API v1"));
             }
 
             app.UseRouting();
